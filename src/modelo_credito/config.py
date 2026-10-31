@@ -1,0 +1,58 @@
+TARGET = "default"
+
+METADATA_COLUMNS = ["ID", "SAFRA"]
+
+PAY_COLUMNS = ["PAY_0", "PAY_2", "PAY_3", "PAY_4", "PAY_5", "PAY_6"]
+
+BILL_COLUMNS = [
+    "BILL_AMT1",
+    "BILL_AMT2",
+    "BILL_AMT3",
+    "BILL_AMT4",
+    "BILL_AMT5",
+    "BILL_AMT6",
+]
+
+PAY_AMT_COLUMNS = [
+    "PAY_AMT1",
+    "PAY_AMT2",
+    "PAY_AMT3",
+    "PAY_AMT4",
+    "PAY_AMT5",
+    "PAY_AMT6",
+]
+
+TREATMENT_COLUMNS = PAY_COLUMNS + PAY_AMT_COLUMNS
+
+CATEGORICAL_FEATURES = [
+    "SEX",
+    "EDUCATION",
+    "MARRIAGE",
+    "PAY_0",
+    "PAY_2",
+    "PAY_3",
+    "PAY_4",
+    "PAY_5",
+    "PAY_6",
+]
+
+FEATURE_COLUMNS = [
+    "SUM_BILL",
+    "AVG_BILL",
+    "MAX_BILL",
+    "SUM_PAY",
+    "AVG_PAY",
+    "MAX_PAY",
+    "UTILIZACAO",
+    "UTIL_MEDIA",
+    "PCT_PAGAMENTO",
+    "FREQ_ATRASO",
+    "MAX_ATRASO",
+    "LIMIT_PER_CAPITA",
+]
+
+GREEN_DARK = "#1B4D3E"
+GREEN_MID = "#2E8B57"
+GREEN_LIGHT = "#66BB6A"
+GREEN_PALE = "#A3E4D7"
+GREEN_ACCENT = "#0E6251"

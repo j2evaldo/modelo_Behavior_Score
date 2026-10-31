@@ -177,6 +177,8 @@ O modelo completo tinha 16 variáveis. O stepwise removeu `SUM_BILL`, `PAY_2`, `
 - **scikit-learn** — métricas, calibração e validação
 - **matplotlib / seaborn** — visualização
 - **sweetviz** — EDA automatizada
+- **pytest** — testes automatizados
+- **ruff** — lint e padronização
 - **Jupyter** — notebooks
 - **uv** — gestão de dependências
 
@@ -193,7 +195,18 @@ O modelo completo tinha 16 variáveis. O stepwise removeu `SUM_BILL`, `PAY_2`, `
 ├── notebooks/            # pipeline numerado
 ├── prompts/              # diretrizes de agentes
 ├── reports/              # gráficos e relatórios
-├── src/modelo_credito/   # pacote Python
+├── src/modelo_credito/   # pacote Python reutilizável
+│   ├── config.py         # constantes e colunas
+│   ├── data.py           # carga, split e tratamento
+│   ├── features.py       # engenharia de atributos
+│   ├── eda.py            # WoE, IV e monotonicidade
+│   ├── binning.py        # fit/transform do binning
+│   ├── selection.py      # IV, correlação e VIF
+│   ├── modeling.py       # logística, stepwise e modelo portável
+│   ├── evaluation.py     # AUC, KS, Gini, gains e lift
+│   ├── calibration.py    # Platt, Isotonic e Spline
+│   └── plots.py          # gráficos reutilizáveis
+├── tests/                # testes automatizados
 ├── pyproject.toml
 └── README.md
 ```
@@ -217,6 +230,35 @@ data/02_gold/scores_teste_calibrado.parquet
 
 ---
 
+## Pacote Python
+
+A lógica principal do pipeline foi extraída para `src/modelo_credito/`, permitindo reutilização fora dos notebooks.
+
+```python
+from modelo_credito.data import compute_treatment_limits, apply_treatment
+from modelo_credito.features import create_features
+from modelo_credito.binning import build_transformed_dataset, fit_binning_process
+from modelo_credito.selection import select_variables
+from modelo_credito.modeling import stepwise_logit, save_portable_model
+from modelo_credito.evaluation import decision_table, capture_summary
+from modelo_credito.calibration import fit_calibrators, apply_calibrator
+```
+
+Exemplo de uso:
+
+```python
+limites = compute_treatment_limits(treino)
+treino_tratado = apply_treatment(treino, limites)
+treino_fe = create_features(treino_tratado)
+
+process = fit_binning_process(treino_fe, variaveis, categorical_variables=cat)
+treino_woe = build_transformed_dataset(
+    process, treino_fe, variaveis, ["ID", "SAFRA"], "default"
+)
+```
+
+---
+
 ## Como executar
 
 ### 1. Instalar dependências
@@ -225,13 +267,20 @@ data/02_gold/scores_teste_calibrado.parquet
 uv sync
 ```
 
-### 2. Abrir o Jupyter
+### 2. Rodar testes e lint
+
+```bash
+uv run pytest
+uv run ruff check src tests
+```
+
+### 3. Abrir o Jupyter
 
 ```bash
 uv run jupyter lab
 ```
 
-### 3. Executar os notebooks na ordem
+### 4. Executar os notebooks na ordem
 
 ```text
 00_split_dos_dados.ipynb
@@ -267,6 +316,8 @@ Se as bases em `data/01_prata` já existirem, é possível começar pelo noteboo
 - preocupação com auditoria, governança e monitoramento;
 - uso consciente de calibração de probabilidades;
 - organização de código e artefatos para reprodução;
+- empacotamento em biblioteca Python reutilizável e testável;
+- testes automatizados e lint com `pytest` e `ruff`;
 - documentação de arquitetura para novos contextos, incluindo crédito PJ com geografia e CNAE.
 
 ---
